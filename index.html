@@ -117,7 +117,7 @@
 
         .tab-button {
             padding: 10px 8px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             cursor: pointer;
             background-color: #f5f5f5;
             border: none;
@@ -178,8 +178,8 @@
     </div>
 
     <footer>
-        Feedback: <a href="mailto:b@bede.im">b@bede.im</a> | 
-        <a href="https://check-for-flooding.service.gov.uk/station/3379">data</a> | <a href="https://check-for-flooding.service.gov.uk/target-area/112WAFYPM">flood alert</a> | <a href="https://github.com/bede/levelslevels/commits/main/">changelog</a>
+        <a href="mailto:b@bede.im">feedback</a> | 
+        <a href="https://github.com/bede/levelslevels">code</a> | <a href="https://github.com/bede/levelslevels/commits/main/">changelog</a> | <a href="https://check-for-flooding.service.gov.uk/target-area/112WAFYPM">flood alert</a>
     </footer>
 
     <script>
@@ -243,12 +243,13 @@
                 roads: [
                     {
                         name: "Kingsbury to Coat",
-                        amberThreshold: 12.8, // Example threshold, adjust as needed
+                        amberThreshold: 12.9,
                         link: "",
                         markerPosition: [50.9760122, -2.7934033]
                     }
                 ],
-                thresholds: [],
+                thresholds: [
+                ],
                 showOnOverlay: false
             },
             {
@@ -259,12 +260,14 @@
                 roads: [
                     {
                         name: "Hambridge to Curry Rivel",
-                        amberThreshold: 8.55, // Example threshold, adjust as needed
+                        amberThreshold: 8.55,
                         link: "",
                         markerPosition: [50.9952542, -2.8602064]
                     }
                 ],
-                thresholds: [],
+                thresholds: [
+                    { name: "Top of normal range", value: 8.21 }
+                ],
                 showOnOverlay: false
             }
         ];
@@ -392,7 +395,8 @@
                 const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'amber', message: `flood (${diff}cm)` };
             } else {
-                return { color: 'green', message: 'clear' };
+                const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
+                return { color: 'green', message: `clear (${diff}cm)` };
             }
         }
 
