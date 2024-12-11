@@ -51,17 +51,14 @@
             padding: 10px 15px;
             border-radius: 4px;
             z-index: 2;
-            /* No max-width here, so it can be full width on small screens */
         }
 
-        /* On larger screens, introduce a fixed max-width and remove `right` for a narrower overlay */
         @media (min-width: 768px) {
             #map-overlay {
                 max-width: 400px;
                 right: auto;
             }
         }
-
 
         #map-overlay h1 {
             font-size: 1.4rem;
@@ -147,7 +144,7 @@
 
         .chart {
             width: 100%;
-            height: 280px; /* Adjust as needed */
+            height: 280px;
             margin: 0;
             padding: 0;
         }
@@ -217,7 +214,8 @@
                 thresholds: [
                     { name: "Property flooding", value: 8.35 },
                     { name: "Top of normal range", value: 7.06 }
-                ]
+                ],
+                showOnOverlay: true
             },
             {
                 name: "West Moor Drain",
@@ -234,7 +232,40 @@
                 ],
                 thresholds: [
                     { name: "Top of normal range", value: 6.645 }
-                ]
+                ],
+                showOnOverlay: true
+            },
+            {
+                name: "Parrett at Gaw Bridge",
+                url: "https://check-for-flooding.service.gov.uk/station-csv/3072",
+                elementId: "gaw-bridge",
+                datumOffset: 10,
+                roads: [
+                    {
+                        name: "Kingsbury to Coat",
+                        amberThreshold: 12.8, // Example threshold, adjust as needed
+                        link: "",
+                        markerPosition: [50.9760122, -2.7934033]
+                    }
+                ],
+                thresholds: [],
+                showOnOverlay: false
+            },
+            {
+                name: "Isle at Midelney",
+                url: "https://check-for-flooding.service.gov.uk/station-csv/3380",
+                elementId: "midelney",
+                datumOffset: 5.185,
+                roads: [
+                    {
+                        name: "Hambridge to Curry Rivel",
+                        amberThreshold: 8.55, // Example threshold, adjust as needed
+                        link: "",
+                        markerPosition: [50.9952542, -2.8602064]
+                    }
+                ],
+                thresholds: [],
+                showOnOverlay: false
             }
         ];
 
@@ -321,6 +352,9 @@
             roadStatusList.innerHTML = ''; // Clear existing list
 
             SOURCES.forEach(source => {
+                // Only show roads on overlay if source.showOnOverlay is true
+                if (!source.showOnOverlay) return;
+
                 const sourceReading = latestReadings[source.elementId];
                 if (sourceReading) {
                     source.roads.forEach(road => {
@@ -387,7 +421,7 @@
                 y: [threshold.value],
                 mode: "text",
                 text: [`${threshold.name} (${threshold.value.toFixed(2)}m)`],
-                textposition: "top right", // Change this from "top right" to "top left" for left alignment
+                textposition: "top right",
                 textfont: { family: "Inter, sans-serif", size: 10, color: "black" },
                 showlegend: false,
                 hoverinfo: "none"
@@ -441,8 +475,8 @@
             const dataMin = Math.min(...heights);
             const dataMax = Math.max(...heights);
             const thresholdValues = thresholds.map(t => t.value);
-            const thresholdsMin = Math.min(...thresholdValues);
-            const thresholdsMax = Math.max(...thresholdValues);
+            const thresholdsMin = thresholdValues.length ? Math.min(...thresholdValues) : dataMin;
+            const thresholdsMax = thresholdValues.length ? Math.max(...thresholdValues) : dataMax;
 
             const yPadding = 0.1;
             let yMin = Math.min(dataMin, thresholdsMin) - yPadding;
@@ -509,7 +543,6 @@
             tabButtons.appendChild(tabButton);
         }
 
-
         // Initialize tabs
         function initializeTabs() {
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -518,7 +551,6 @@
             // Set default active tab
             tabButtons[0].classList.add('active');
             tabContents[0].classList.add('active');
-            // Ensure the chart in the active tab is resized correctly
             Plotly.Plots.resize(tabContents[0]);
 
             tabButtons.forEach(button => {
@@ -548,10 +580,9 @@
                 attributionControl: false,
                 scrollWheelZoom: false,
                 boxZoom: false,
-                boxZoom: false,
-                keyboard: false,  
+                keyboard: false,
                 zoomControl: false
-            }).setView([51.028, -2.82], 12);
+            }).setView([51.024, -2.82], 12);
 
             // Add OpenStreetMap tiles
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -559,9 +590,9 @@
                     "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
             }).addTo(map);
 
-            // Add zoom control to the right side
+            // Add zoom control to the left side
             L.control.zoom({
-                position: 'bottomleft' // Move zoom control to the top right corner
+                position: 'bottomleft'
             }).addTo(map);
 
             // Add markers for each road
@@ -595,7 +626,7 @@
             L.marker(position, {
                 icon: L.divIcon({
                     className: "custom-icon",
-                    html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%;"></div>`
+                    html: `<div style="background-color: ${color}; position: relative; top: -4px; left: -4px; width: 20px; height: 20px; border-radius: 50%;"></div>`
                 })
             })
                 .addTo(map)
