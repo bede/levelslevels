@@ -324,7 +324,7 @@
             }
 
             console.log(`Fetching new data for ${source.name}`);
-            const response = await fetch(source.url);
+            const response = await fetch(source.url, { cache: 'no-store' });
             if (!response.ok) throw new Error("Failed to fetch data");
             const csvData = await response.text();
 
