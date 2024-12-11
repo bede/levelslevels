@@ -359,22 +359,24 @@
                 if (sourceReading) {
                     source.roads.forEach(road => {
                         const status = determineStatus(sourceReading.height, road.amberThreshold);
+                        
+                        // Only proceed if status is amber or red
+                        if (status.color === 'amber' || status.color === 'red') {
+                            const li = document.createElement('li');
+                            const circle = document.createElement('span');
+                            circle.classList.add('circle', status.color);
+                            li.appendChild(circle);
 
-                        const li = document.createElement('li');
+                            const text = document.createElement('span');
+                            if (road.link) {
+                                text.innerHTML = `<a href="${road.link}">${road.name}</a>: <strong>${status.message}</strong>`;
+                            } else {
+                                text.innerHTML = `${road.name}: <strong>${status.message}</strong>`;
+                            }
+                            li.appendChild(text);
 
-                        const circle = document.createElement('span');
-                        circle.classList.add('circle', status.color);
-                        li.appendChild(circle);
-
-                        const text = document.createElement('span');
-                        if (road.link) {
-                            text.innerHTML = `<a href="${road.link}">${road.name}</a>: <strong>${status.message}</strong>`;
-                        } else {
-                            text.innerHTML = `${road.name}: <strong>${status.message}</strong>`;
+                            roadStatusList.appendChild(li);
                         }
-                        li.appendChild(text);
-
-                        roadStatusList.appendChild(li);
                     });
                 }
             });
@@ -582,7 +584,7 @@
                 boxZoom: false,
                 keyboard: false,
                 zoomControl: false
-            }).setView([51.024, -2.82], 12);
+            }).setView([51.020, -2.82], 12);
 
             // Add OpenStreetMap tiles
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
