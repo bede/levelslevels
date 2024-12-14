@@ -156,10 +156,11 @@
         }
     </style>
     <script>
-        !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetGroupPropertiesForFlags resetPersonPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
         posthog.init('phc_KlFKZyqiluUOIZvbdp6T129dDvRVRaAcKICHPeBejch', {
             api_host:'https://eu.i.posthog.com',
-            person_profiles: 'always'
+            opt_out_capturing_by_default: true,
+            autocapture: false
         })
     </script>
 </head>
@@ -167,8 +168,8 @@
     <div id="map-container">
         <div id="map-overlay">
             <h1>Muchelney area flood status</h1>
-            <ul id="road-status-list">
-                <!-- Road statuses will be inserted here -->
+            <ul id="route-status-list">
+                <!-- Route statuses will be inserted here -->
             </ul>
         </div>
         <div id="map"></div>
@@ -198,7 +199,7 @@
                 url: "https://check-for-flooding.service.gov.uk/station-csv/3379",
                 elementId: "long-load",
                 datumOffset: 5,
-                roads: [
+                routes: [
                     {
                         name: "Langport to Muchelney",
                         amberThreshold: 7.30,
@@ -229,7 +230,7 @@
                 url: "https://check-for-flooding.service.gov.uk/station-csv/3381",
                 elementId: "west-moor",
                 datumOffset: 5.185,
-                roads: [
+                routes: [
                     {
                         name: "Hambridge to Burrow",
                         amberThreshold: 7.70,
@@ -247,7 +248,7 @@
                 url: "https://check-for-flooding.service.gov.uk/station-csv/3072",
                 elementId: "gaw-bridge",
                 datumOffset: 10,
-                roads: [
+                routes: [
                     {
                         name: "Kingsbury to Coat",
                         amberThreshold: 12.9,
@@ -264,7 +265,7 @@
                 url: "https://check-for-flooding.service.gov.uk/station-csv/3380",
                 elementId: "midelney",
                 datumOffset: 5.185,
-                roads: [
+                routes: [
                     {
                         name: "Hambridge to Curry Rivel",
                         amberThreshold: 8.55,
@@ -289,7 +290,7 @@
         // Global object to store latest readings
         const latestReadings = {};
 
-        // Fetch data, create charts, and update road statuses
+        // Fetch data, create charts, and update route statuses
         async function fetchAndProcessData() {
             try {
                 // Fetch data for all sources
@@ -300,8 +301,8 @@
                     renderChart(parsedData, source);
                 }));
 
-                // Update road statuses
-                updateRoadStatuses();
+                // Update route statuses
+                updateRouteStatuses();
 
                 // Render map
                 renderMap();
@@ -356,49 +357,67 @@
                 });
         }
 
-        // Update road statuses
-        function updateRoadStatuses() {
-            const roadStatusList = document.getElementById('road-status-list');
-            roadStatusList.innerHTML = ''; // Clear existing list
+        // Update route statuses
+        function updateRouteStatuses() {
+            const routeStatusList = document.getElementById('route-status-list');
+            routeStatusList.innerHTML = ''; // Clear existing list
+
+            let hasFloodedRoutes = false;
 
             SOURCES.forEach(source => {
-                // Only show roads on overlay if source.showOnOverlay is true
+                // Only show routes on overlay if source.showOnOverlay is true
                 if (!source.showOnOverlay) return;
 
                 const sourceReading = latestReadings[source.elementId];
                 if (sourceReading) {
-                    source.roads.forEach(road => {
-                        const status = determineStatus(sourceReading.height, road.amberThreshold);
-                        
+                    source.routes.forEach(route => {
+                        const status = determineStatus(sourceReading.height, route.amberThreshold);
                         // Only proceed if status is amber or red
                         if (status.color === 'amber' || status.color === 'red') {
+                            hasFloodedRoutes = true;
                             const li = document.createElement('li');
                             const circle = document.createElement('span');
                             circle.classList.add('circle', status.color);
                             li.appendChild(circle);
 
                             const text = document.createElement('span');
-                            if (road.link) {
-                                text.innerHTML = `<a href="${road.link}">${road.name}</a>: <strong>${status.message}</strong>`;
+                            if (route.link) {
+                                text.innerHTML = `<a href="${route.link}">${route.name}</a>: <strong>${status.message}</strong>`;
                             } else {
-                                text.innerHTML = `${road.name}: <strong>${status.message}</strong>`;
+                                text.innerHTML = `${route.name}: <strong>${status.message}</strong>`;
                             }
                             li.appendChild(text);
 
-                            roadStatusList.appendChild(li);
+                            routeStatusList.appendChild(li);
                         }
                     });
                 }
             });
+
+            // Show "All clear" message if no flooded routes are detected
+            if (!hasFloodedRoutes) {
+                const li = document.createElement('li');
+
+                const circle = document.createElement('span');
+                circle.classList.add('circle', 'green');
+                li.appendChild(circle);
+
+                const text = document.createElement('span');
+                text.innerHTML = `All clear (but check <a href="https://www.somerset.gov.uk/roads-travel-and-parking/emergency-road-closure-gates">Langport gate status</a>)`;
+                li.appendChild(text);
+
+                routeStatusList.appendChild(li);
+            }
         }
 
-        // Determine road status
+        // Determine route status (amber if flood is 0.01m or more above the amber threshold)
         function determineStatus(height, amberThreshold) {
             const redThreshold = amberThreshold + 0.30; // Red threshold is 30cm above amber
+            // Amber if (height - amberThreshold) >= 0.01
             if (height >= redThreshold) {
                 const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'red', message: `flood (${diff}cm)` };
-            } else if (height >= amberThreshold) {
+            } else if (height >= amberThreshold + 0.01) {
                 const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'amber', message: `flood (${diff}cm)` };
             } else {
@@ -411,11 +430,11 @@
             const timestamps = parsedData.map(d => d.timestamp);
             const heights = parsedData.map(d => d.height);
 
-            // Create threshold lines and labels for roads and additional thresholds
+            // Create threshold lines and labels for routes and additional thresholds
             const thresholds = [
-                ...source.roads.map((road) => ({
-                    name: road.name,
-                    value: road.amberThreshold
+                ...source.routes.map((route) => ({
+                    name: route.name,
+                    value: route.amberThreshold
                 })),
                 ...(source.thresholds || [])
             ];
@@ -608,20 +627,20 @@
                 position: 'bottomleft'
             }).addTo(map);
 
-            // Add markers for each road
+            // Add markers for each route
             SOURCES.forEach(source => {
                 const sourceReading = latestReadings[source.elementId];
                 if (sourceReading) {
-                    source.roads.forEach(road => {
-                        if (road.markerPosition) {
-                            const status = determineStatus(sourceReading.height, road.amberThreshold);
+                    source.routes.forEach(route => {
+                        if (route.markerPosition) {
+                            const status = determineStatus(sourceReading.height, route.amberThreshold);
                             addMarker(
                                 map,
-                                road.markerPosition,
-                                road.name,
+                                route.markerPosition,
+                                route.name,
                                 source.name,
                                 status,
-                                determineMarkerColor(sourceReading.height, road.amberThreshold)
+                                determineMarkerColor(sourceReading.height, route.amberThreshold)
                             );
                         }
                     });
@@ -630,9 +649,9 @@
         }
 
         // Add a marker to the map
-        function addMarker(map, position, roadName, sourceName, status, color) {
+        function addMarker(map, position, routeName, sourceName, status, color) {
             const popupContent = `
-                <strong>${roadName}</strong><br>
+                <strong>${routeName}</strong><br>
                 Tracks ${sourceName} level<br>
                 Status: <strong>${status.message}</strong>
             `;
@@ -650,7 +669,7 @@
         function determineMarkerColor(height, amberThreshold) {
             const redThreshold = amberThreshold + 0.30;
             if (height >= redThreshold) return COLORS.red;
-            if (height >= amberThreshold) return COLORS.amber;
+            if (height >= amberThreshold + 0.01) return COLORS.amber;
             return COLORS.green;
         }
 
