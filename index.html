@@ -298,21 +298,27 @@
         // Fetch data, create charts, and update route statuses
         async function fetchAndProcessData() {
             try {
-                // Fetch data for all sources
-                await Promise.all(SOURCES.map(async (source) => {
-                    const parsedData = await fetchData(source);
+                // Fetch data for all sources in parallel
+                const allData = await Promise.all(
+                    SOURCES.map(async (source) => {
+                        const parsedData = await fetchData(source);
+                        return { source, parsedData };
+                    })
+                );
+
+                // Now that we have all data in allData (in the same order as SOURCES),
+                // we can loop through them in order to ensure stable tab order
+                allData.forEach(({ source, parsedData }) => {
                     const latestReading = parsedData[parsedData.length - 1];
                     latestReadings[source.elementId] = latestReading;
                     renderChart(parsedData, source);
-                }));
+                });
 
-                // Update route statuses
+                // Update route statuses and render map after all charts are created
                 updateRouteStatuses();
-
-                // Render map
                 renderMap();
 
-                // Initialize tabs
+                // Initialize tabs after they have all been created
                 initializeTabs();
 
                 // Resize the chart in the default active tab
