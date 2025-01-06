@@ -212,8 +212,7 @@
                         markerPosition: [51.0266797, -2.8174208],
                         manualStatus: {
                             override: true,
-                            status: "red",
-                            message: "gate closed"
+                            suffix: "gate closed"
                         }
                     },
                     {
@@ -428,12 +427,11 @@
 
         // Determine route status (amber if flood is 0.01m or more above the amber threshold)
         function determineStatus(height, amberThreshold, manualStatus) {
-            if (manualStatus?.override) {
-                return { color: manualStatus.status, message: manualStatus.message };
-            }
             const redThreshold = amberThreshold + 0.30; // Red threshold is 30cm above amber
-            // Amber if (height - amberThreshold) >= 0.01
-            if (height >= redThreshold) {
+            if (manualStatus?.override) {
+                const diff = ((height - amberThreshold) * 100).toFixed(0);
+                return { color: "red", message: `${manualStatus.suffix} (${diff}cm)` };
+            } else if (height >= redThreshold) {
                 const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'red', message: `flood (${diff}cm)` };
             } else if (height >= amberThreshold + 0.01) {
@@ -659,7 +657,7 @@
                                 route.name,
                                 source.name,
                                 status,
-                                determineMarkerColor(sourceReading.height, route.amberThreshold)
+                                determineMarkerColor(sourceReading.height, route.amberThreshold, route.manualStatus)
                             );
                         }
                     });
@@ -685,7 +683,8 @@
         }
 
         // Determine marker color
-        function determineMarkerColor(height, amberThreshold) {
+        function determineMarkerColor(height, amberThreshold, manualStatus) {
+            if (manualStatus?.override) return COLORS.red;
             const redThreshold = amberThreshold + 0.30;
             if (height >= redThreshold) return COLORS.red;
             if (height >= amberThreshold + 0.01) return COLORS.amber;
