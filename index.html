@@ -209,7 +209,12 @@
                         name: "Langport to Muchelney",
                         amberThreshold: 7.30,
                         link: "https://www.somerset.gov.uk/roads-travel-and-parking/emergency-road-closure-gates/",
-                        markerPosition: [51.0266797, -2.8174208]
+                        markerPosition: [51.0266797, -2.8174208],
+                        manualStatus: {
+                            override: true,
+                            status: "red",
+                            message: "gate closed"
+                        }
                     },
                     {
                         name: "Muchelney to Long Load",
@@ -275,7 +280,7 @@
                         name: "Hambridge to Curry Rivel",
                         amberThreshold: 8.55,
                         link: "",
-                        markerPosition: [50.9952542, -2.8602064]
+                        markerPosition: [50.9952542, -2.8602064],
                     }
                 ],
                 thresholds: [
@@ -382,7 +387,7 @@
                 const sourceReading = latestReadings[source.elementId];
                 if (sourceReading) {
                     source.routes.forEach(route => {
-                        const status = determineStatus(sourceReading.height, route.amberThreshold);
+                        const status = determineStatus(sourceReading.height, route.amberThreshold, route.manualStatus);
                         // Only proceed if status is amber or red
                         if (status.color === 'amber' || status.color === 'red') {
                             hasFloodedRoutes = true;
@@ -422,7 +427,10 @@
         }
 
         // Determine route status (amber if flood is 0.01m or more above the amber threshold)
-        function determineStatus(height, amberThreshold) {
+        function determineStatus(height, amberThreshold, manualStatus) {
+            if (manualStatus?.override) {
+                return { color: manualStatus.status, message: manualStatus.message };
+            }
             const redThreshold = amberThreshold + 0.30; // Red threshold is 30cm above amber
             // Amber if (height - amberThreshold) >= 0.01
             if (height >= redThreshold) {
@@ -644,7 +652,7 @@
                 if (sourceReading) {
                     source.routes.forEach(route => {
                         if (route.markerPosition) {
-                            const status = determineStatus(sourceReading.height, route.amberThreshold);
+                            const status = determineStatus(sourceReading.height, route.amberThreshold, route.manualStatus);
                             addMarker(
                                 map,
                                 route.markerPosition,
