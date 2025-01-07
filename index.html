@@ -79,7 +79,7 @@
         }
 
         #map-overlay ul li {
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
@@ -228,7 +228,6 @@
                     }
                 ],
                 thresholds: [
-                    { name: "Property flooding", value: 8.35 },
                     { name: "Top of normal range", value: 7.06 }
                 ],
                 showOnOverlay: true
@@ -491,7 +490,7 @@
             const latestDate = new Date(latestReading.timestamp);
             const hours = latestDate.getUTCHours().toString().padStart(2, '0');
             const minutes = latestDate.getUTCMinutes().toString().padStart(2, '0');
-            const timeString = `${hours}:${minutes} UTC`;
+            const timeString = `${hours}:${minutes}`;
 
             const latestPointTrace = {
                 x: [latestReading.timestamp],
@@ -510,8 +509,8 @@
                 text: `${latestReading.height.toFixed(2)}m (${timeString})`,
                 showarrow: true,
                 arrowhead: 6,
-                ax: -22,
-                ay: -22,
+                ax: -18,
+                ay: -18,
                 font: { family: "Inter, sans-serif", size: 12, color: "black" },
                 bordercolor: "black",
                 borderwidth: 1,
