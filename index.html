@@ -579,7 +579,7 @@
 
             const yPadding = 0.1;
             let yMin = Math.min(dataMin, thresholdsMin) - yPadding;
-            let yMax = Math.max(dataMax, thresholdsMax) + yPadding;
+            let yMax = Math.max(dataMax, thresholdsMax, latestReading.height) + yPadding + 0.1;
             if (yMin < 0) yMin = 0;
 
             const layout = {
