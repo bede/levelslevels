@@ -428,6 +428,7 @@
             routeStatusList.innerHTML = ''; // Clear existing list
 
             let hasFloodedRoutes = false;
+            let minDelta = Infinity;
 
             SOURCES.forEach(source => {
                 // Only show routes on overlay if source.showOnOverlay is true
@@ -436,6 +437,12 @@
                 const sourceReading = latestReadings[source.elementId];
                 if (sourceReading) {
                     source.routes.forEach(route => {
+                        // Calculate delta (distance to amber threshold)
+                        const delta = route.amberThreshold - sourceReading.height;
+                        if (delta > 0 && delta < minDelta) {
+                            minDelta = delta;
+                        }
+
                         const status = determineStatus(sourceReading.height, route.amberThreshold, route.manualStatus);
                         // Only proceed if status is amber or red
                         if (status.color === 'amber' || status.color === 'red') {
@@ -468,7 +475,8 @@
                 li.appendChild(circle);
 
                 const text = document.createElement('span');
-                text.innerHTML = `All routes clear (but check <a href="https://www.somerset.gov.uk/roads-travel-and-parking/emergency-road-closure-gates">gate status</a>)`;
+                const deltaCm = Math.round(minDelta * 100);
+                text.innerHTML = `All routes clear (&#8805;${deltaCm}cm above water)`;
                 li.appendChild(text);
 
                 routeStatusList.appendChild(li);
