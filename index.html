@@ -258,7 +258,7 @@
                 routes: [
                     {
                         name: "Langport to Muchelney",
-                        amberThreshold: 7.21,
+                        threshold: 7.21,
                         link: "https://www.somerset.gov.uk/roads-travel-and-parking/emergency-road-closure-gates/",
                         markerPosition: [51.0266797, -2.8174208],
                         manualStatus: {
@@ -268,13 +268,13 @@
                     },
                     {
                         name: "Muchelney to Long Load",
-                        amberThreshold: 7.86,
+                        threshold: 7.86,
                         link: "",
                         markerPosition: [51.009468, -2.793615]
                     },
                     {
                         name: "Muchelney to Thorney",
-                        amberThreshold: 7.93,
+                        threshold: 7.93,
                         link: "",
                         markerPosition: [51.0132813, -2.8149388]
                     }
@@ -292,7 +292,7 @@
                 routes: [
                     {
                         name: "Hambridge to Burrow",
-                        amberThreshold: 7.80,
+                        threshold: 7.80,
                         link: "",
                         markerPosition: [50.9856215, -2.8500948]
                     }
@@ -310,7 +310,7 @@
                 routes: [
                     {
                         name: "Kingsbury to Coat",
-                        amberThreshold: 12.9,
+                        threshold: 12.9,
                         link: "",
                         markerPosition: [50.9760122, -2.7934033]
                     }
@@ -327,7 +327,7 @@
                 routes: [
                     {
                         name: "Hambridge to Curry Rivel",
-                        amberThreshold: 8.95,
+                        threshold: 8.95,
                         link: "",
                         markerPosition: [50.9952542, -2.8602064],
                     }
@@ -438,12 +438,12 @@
                 if (sourceReading) {
                     source.routes.forEach(route => {
                         // Calculate delta (distance to amber threshold)
-                        const delta = route.amberThreshold - sourceReading.height;
+                        const delta = route.threshold - sourceReading.height;
                         if (delta > 0 && delta < minDelta) {
                             minDelta = delta;
                         }
 
-                        const status = determineStatus(sourceReading.height, route.amberThreshold, route.manualStatus);
+                        const status = determineStatus(sourceReading.height, route.threshold, route.manualStatus);
                         // Only proceed if status is amber or red
                         if (status.color === 'amber' || status.color === 'red') {
                             hasFloodedRoutes = true;
@@ -484,19 +484,19 @@
         }
 
         // Determine route status (amber if flood is 0.01m or more above the amber threshold)
-        function determineStatus(height, amberThreshold, manualStatus) {
-            const redThreshold = amberThreshold + 0.30; // Red threshold is 30cm above amber
+        function determineStatus(height, threshold, manualStatus) {
+            const redThreshold = threshold + 0.30; // Red threshold is 30cm above amber
             if (manualStatus?.override) {
-                const diff = ((height - amberThreshold) * 100).toFixed(0);
+                const diff = ((height - threshold) * 100).toFixed(0);
                 return { color: "red", message: `${manualStatus.suffix} (${diff}cm)` };
             } else if (height >= redThreshold) {
-                const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
+                const diff = ((height - threshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'red', message: `flood (${diff}cm)` };
-            } else if (height >= amberThreshold + 0.01) {
-                const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
+            } else if (height >= threshold + 0.01) {
+                const diff = ((height - threshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'amber', message: `flood (${diff}cm)` };
             } else {
-                const diff = ((height - amberThreshold) * 100).toFixed(0); // Difference in cm
+                const diff = ((height - threshold) * 100).toFixed(0); // Difference in cm
                 return { color: 'green', message: `clear (${diff}cm)` };
             }
         }
@@ -509,7 +509,7 @@
             const thresholds = [
                 ...source.routes.map((route) => ({
                     name: route.name,
-                    value: route.amberThreshold
+                    value: route.threshold
                 })),
                 ...(source.thresholds || [])
             ];
@@ -709,14 +709,14 @@
                 if (sourceReading) {
                     source.routes.forEach(route => {
                         if (route.markerPosition) {
-                            const status = determineStatus(sourceReading.height, route.amberThreshold, route.manualStatus);
+                            const status = determineStatus(sourceReading.height, route.threshold, route.manualStatus);
                             addMarker(
                                 map,
                                 route.markerPosition,
                                 route.name,
                                 source.name,
                                 status,
-                                determineMarkerColor(sourceReading.height, route.amberThreshold, route.manualStatus)
+                                determineMarkerColor(sourceReading.height, route.threshold, route.manualStatus)
                             );
                         }
                     });
@@ -744,11 +744,11 @@
         }
 
         // Determine marker color
-        function determineMarkerColor(height, amberThreshold, manualStatus) {
+        function determineMarkerColor(height, threshold, manualStatus) {
             if (manualStatus?.override) return COLORS.red;
-            const redThreshold = amberThreshold + 0.30;
+            const redThreshold = threshold + 0.30;
             if (height >= redThreshold) return COLORS.red;
-            if (height >= amberThreshold + 0.01) return COLORS.amber;
+            if (height >= threshold + 0.01) return COLORS.amber;
             return COLORS.green;
         }
 
