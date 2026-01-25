@@ -534,15 +534,54 @@
                 hoverinfo: "none"
             }));
 
+            // Red fill for area above the lowest threshold
+            const lowestThreshold = thresholds.length > 0
+                ? Math.min(...thresholds.map(t => t.value))
+                : null;
+
+            // Blue fill trace, ceiling'd at lowest threshold to avoid overlap
+            const waterLevelFillTrace = {
+                x: timestamps,
+                y: lowestThreshold !== null
+                    ? heights.map(h => Math.min(h, lowestThreshold))
+                    : heights,
+                mode: "lines",
+                line: { width: 0 },
+                fill: "tozeroy",
+                fillcolor: "rgba(31, 118, 180, 0.25)",
+                hoverinfo: "none",
+                showlegend: false
+            };
+
+            // Water level line (no fill)
             const waterLevelTrace = {
                 x: timestamps,
                 y: heights,
                 mode: "lines",
                 name: "",
-                line: { color: "#1f77b4", width: 2 },
-                fill: "tozeroy",
-                fillcolor: "rgba(31, 118, 180, 0.1)"
+                line: { color: "#1f77b4", width: 2 }
             };
+
+            const thresholdFillTraces = lowestThreshold !== null ? [
+                {
+                    x: timestamps,
+                    y: timestamps.map(() => lowestThreshold),
+                    mode: "lines",
+                    line: { width: 0 },
+                    hoverinfo: "none",
+                    showlegend: false
+                },
+                {
+                    x: timestamps,
+                    y: heights.map(h => Math.max(h, lowestThreshold)),
+                    mode: "lines",
+                    line: { width: 0 },
+                    fill: "tonexty",
+                    fillcolor: "rgba(244, 67, 54, 0.4)",
+                    hoverinfo: "none",
+                    showlegend: false
+                }
+            ] : [];
 
             const latestReading = parsedData[parsedData.length - 1];
 
@@ -633,7 +672,7 @@
 
             Plotly.newPlot(
                 `chart-${source.elementId}`,
-                [waterLevelTrace, latestPointTrace, ...thresholdLines, ...thresholdLabels, currentLevelLine],
+                [waterLevelFillTrace, ...thresholdFillTraces, waterLevelTrace, latestPointTrace, ...thresholdLines, ...thresholdLabels, currentLevelLine],
                 layout,
                 {
                     responsive: true,
