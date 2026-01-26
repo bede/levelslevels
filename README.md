@@ -10,4 +10,5 @@ https://levelslevels.uk
 - **Nick Frost**: thresholds for Langport to Muchelney, Muchelney to Thorney and Muchelney to Long Load
 - **Roderic Baillie-Grohman**: thresholds for Gaw Bridge and Hambridge to Curry Rivel
 - **Christoph Kollmeier**: threshold for Hambridge to Burrow
+- **Steven Pearce**: threshold for Muchelney to Long Load
 - **Sam Wainwright**: user interface feedback
