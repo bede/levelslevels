@@ -427,8 +427,8 @@
             const routeStatusList = document.getElementById('route-status-list');
             routeStatusList.innerHTML = ''; // Clear existing list
 
-            let hasFloodedRoutes = false;
             let minDelta = Infinity;
+            const routeItems = [];
 
             SOURCES.forEach(source => {
                 // Only show routes on overlay if source.showOnOverlay is true
@@ -444,30 +444,49 @@
                         }
 
                         const status = determineStatus(sourceReading.height, route.threshold, route.manualStatus);
-                        // Only proceed if status is amber or red
+                        // Only collect amber or red items
                         if (status.color === 'amber' || status.color === 'red') {
-                            hasFloodedRoutes = true;
-                            const li = document.createElement('li');
-                            const circle = document.createElement('span');
-                            circle.classList.add('circle', status.color);
-                            li.appendChild(circle);
-
-                            const text = document.createElement('span');
-                            if (route.link) {
-                                text.innerHTML = `<a href="${route.link}">${route.name}</a>: <strong>${status.message}</strong>`;
-                            } else {
-                                text.innerHTML = `${route.name}: <strong>${status.message}</strong>`;
-                            }
-                            li.appendChild(text);
-
-                            routeStatusList.appendChild(li);
+                            const depth = parseFloat(((sourceReading.height - route.threshold) * 100).toFixed(0));
+                            routeItems.push({
+                                color: status.color,
+                                depth: depth,
+                                route: route,
+                                status: status
+                            });
                         }
                     });
                 }
             });
 
+            // Sort by color priority (red first, then amber), then by depth descending
+            const colorPriority = { red: 0, amber: 1 };
+            routeItems.sort((a, b) => {
+                if (colorPriority[a.color] !== colorPriority[b.color]) {
+                    return colorPriority[a.color] - colorPriority[b.color];
+                }
+                return b.depth - a.depth; // Higher depth first within same color
+            });
+
+            // Render sorted items to DOM
+            routeItems.forEach(item => {
+                const li = document.createElement('li');
+                const circle = document.createElement('span');
+                circle.classList.add('circle', item.status.color);
+                li.appendChild(circle);
+
+                const text = document.createElement('span');
+                if (item.route.link) {
+                    text.innerHTML = `<a href="${item.route.link}">${item.route.name}</a>: <strong>${item.status.message}</strong>`;
+                } else {
+                    text.innerHTML = `${item.route.name}: <strong>${item.status.message}</strong>`;
+                }
+                li.appendChild(text);
+
+                routeStatusList.appendChild(li);
+            });
+
             // Show "All clear" message if no flooded routes are detected
-            if (!hasFloodedRoutes) {
+            if (routeItems.length === 0) {
                 const li = document.createElement('li');
 
                 const circle = document.createElement('span');
