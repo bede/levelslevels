@@ -139,6 +139,16 @@
             color: #1f77b4;
         }
 
+        .chart-hidden {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .chart-hidden {
+                display: revert;
+            }
+        }
+
         .tab-content {
             display: none;
         }
@@ -295,13 +305,13 @@
                 showOnOverlay: true
             },
             {
-                name: "Parrett at Gaw Bridge",
+                name: "Parrett at Gaw bridge",
                 url: "https://check-for-flooding.service.gov.uk/station-csv/3072",
                 elementId: "gaw-bridge",
                 datumOffset: 10,
                 routes: [
                     {
-                        name: "Gaw Bridge",
+                        name: "Gaw bridge",
                         threshold: 12.9,
                         link: "",
                         markerPosition: [50.9760122, -2.7934033]
@@ -327,6 +337,23 @@
                 thresholds: [
                     // { name: "Top of normal range", value: 8.21 }
                 ],
+                showOnOverlay: true
+            },
+            {
+                name: "Huish Level Rhyne",
+                url: "https://check-for-flooding.service.gov.uk/station-csv/3065",
+                elementId: "westover-bridge",
+                hideChart: true,
+                datumOffset: 5,
+                routes: [
+                    {
+                        name: "Westover bridge",
+                        threshold: 8.8,
+                        link: "",
+                        markerPosition: [51.019942384116874, -2.820347939959784]
+                    }
+                ],
+                thresholds: [],
                 showOnOverlay: true
             }
         ];
@@ -679,6 +706,7 @@
             const chartDiv = document.createElement('div');
             chartDiv.id = `chart-${source.elementId}`;
             chartDiv.classList.add('chart', 'tab-content');
+            if (source.hideChart) chartDiv.classList.add('chart-hidden');
             tabContents.appendChild(chartDiv);
 
             Plotly.newPlot(
@@ -697,6 +725,7 @@
             const tabButtons = document.getElementById('tab-buttons');
             const tabButton = document.createElement('button');
             tabButton.classList.add('tab-button');
+            if (source.hideChart) tabButton.classList.add('chart-hidden');
             tabButton.textContent = source.name;
             tabButton.dataset.target = `chart-${source.elementId}`;
             tabButtons.appendChild(tabButton);
