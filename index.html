@@ -458,7 +458,7 @@
                     source.routes.forEach(route => {
                         // Calculate delta (distance to amber threshold)
                         const delta = route.threshold - sourceReading.height;
-                        if (delta > 0 && delta < minDelta) {
+                        if (delta >= 0 && delta < minDelta) {
                             minDelta = delta;
                         }
 
